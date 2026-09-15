@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# Database
+*.db
+
+# Chroma database
+data/chroma_db/
+
+# Face encodings (optional)
+encodings.pkl
+labels.pkl
+
+# Uploads (optional)
+data/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
