@@ -400,21 +400,7 @@ multimodal-ai-assistant/
 | Diagrams | Mermaid | ER diagrams rendered in-browser |
 
 ---
-
-## 📸 Screenshots
-
-Place captures in `docs/screenshots/` and they will render here:
-
-```markdown
-![Face login](docs/screenshots/01-face-login.png)
-![Dashboard](docs/screenshots/02-dashboard.png)
-![ER diagram](docs/screenshots/03-er-diagram.png)
-```
-
-Worth capturing: the face-auth gate, a generated dashboard with KPI cards, an
-ER diagram, and a RAG answer citing its source document.
-
----
+ 
 
 ## 🚀 Installation
 
@@ -649,13 +635,7 @@ data/chroma_db/
 data/memory.json
 __pycache__/
 *.pyc
-```
-
-If a key has already been pushed, **revoke it** at `aistudio.google.com` and
-issue a new one. Deleting the file in a later commit does not remove it from
-git history — scrapers index public repositories within minutes of a push.
-
----
+ 
 
 <div align="center">
 
