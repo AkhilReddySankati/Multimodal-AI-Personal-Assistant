@@ -423,16 +423,17 @@ __pycache__/
 
 💼 Areas of Interest: Data Science | Generative AI | Agentic AI | Machine Learning
 
-🔗 **GitHub:** https://github.com/akhil2203031050881
+🔗 **GitHub:** [AkhilReddySankati](https://github.com/AkhilReddySankati)
 
-🔗 **LinkedIn:** https://linkedin.com/in/akhil-reddy-sankati-ba5212320
+🔗 **LinkedIn:** [Akhil Reddy Sankati](https://www.linkedin.com/in/akhil-reddy-sankati-datascientist/)
 
 📧 **Email:** akhilreddysankati1328@gmail.com
 
 ---
 
 <p align="center">
-  <b>Built with Python, Google Gemini, RAG and Agentic AI.</b>
+  **Built with Python, Google Gemini, RAG and Agentic AI.**
   <br/>
   ⭐ If you find this project interesting, consider giving it a star!
 </p>
+ 
