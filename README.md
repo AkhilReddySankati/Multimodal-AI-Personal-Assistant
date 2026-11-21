@@ -45,34 +45,61 @@ The application follows a modular architecture where Streamlit manages the user 
 
 ```mermaid
 flowchart TD
-    A["👤 User"] --> B["Streamlit Interface"]
-    B --> C{"Face Authentication"}
+    A(["👤 User"]) --> B["🖥️ Streamlit Interface"]
+    B --> C{"🔐 Face Authentication"}
 
-    C -->|Failed| D["Access Denied"]
-    C -->|Successful| E["Text / Voice Input"]
+    C -->|❌ Failed| D["⛔ Access Denied"]
+    C -->|✅ Successful| E["🎤 Text / Voice Input"]
 
-    E --> F["Gemini Agent"]
+    E --> F["🧠 Gemini Agent"]
 
-    F --> G["Conversation Memory"]
-    F --> H["Tool Dispatch Layer"]
+    F --> G[("💾 Conversation Memory")]
+    F --> H{{"🔀 Tool Dispatch Layer"}}
 
-    H --> I["Document RAG"]
-    H --> J["Data Analysis"]
-    H --> K["Dashboard Generation"]
-    H --> L["ER Diagram"]
-    H --> M["File Inspection"]
-    H --> N["Code Generation"]
-    H --> O["Calculator"]
+    H --> I["📚 Document RAG"]
+    H --> J["📊 Data Analysis"]
+    H --> K["📈 Dashboard Generation"]
+    H --> L["🗂️ ER Diagram"]
+    H --> M["🔍 File Inspection"]
+    H --> N["💻 Code Generation"]
+    H --> O["🧮 Calculator"]
 
-    I --> P[("ChromaDB")]
-    J --> Q["Analysis Results"]
-    K --> R["Interactive Charts"]
-    L --> S["Mermaid Diagram"]
+    I --> P[("🗄️ ChromaDB")]
+    J --> Q["📋 Analysis Results"]
+    K --> R["📉 Interactive Charts"]
+    L --> S["🧩 Mermaid Diagram"]
 
-    Q --> T["Agent Response"]
+    Q --> T(["💬 Agent Response"])
     R --> T
     S --> T
-    T --> B
+    T -.->|"🔁 shown to user"| B
+
+    classDef user fill:#6C5CE7,stroke:#4834D4,stroke-width:2px,color:#fff
+    classDef ui fill:#FF4B4B,stroke:#C0392B,stroke-width:2px,color:#fff
+    classDef auth fill:#FDCB6E,stroke:#E17055,stroke-width:2px,color:#2D3436
+    classDef deny fill:#D63031,stroke:#8E1E1E,stroke-width:2px,color:#fff
+    classDef input fill:#00B894,stroke:#00866B,stroke-width:2px,color:#fff
+    classDef agent fill:#0984E3,stroke:#065A9E,stroke-width:3px,color:#fff
+    classDef memory fill:#A29BFE,stroke:#6C5CE7,stroke-width:2px,color:#2D3436
+    classDef dispatch fill:#2D3436,stroke:#000,stroke-width:2px,color:#fff
+    classDef tool fill:#00CEC9,stroke:#00A8A3,stroke-width:2px,color:#2D3436
+    classDef db fill:#FFB000,stroke:#C98A00,stroke-width:2px,color:#2D3436
+    classDef output fill:#FD79A8,stroke:#E84393,stroke-width:2px,color:#2D3436
+    classDef response fill:#55EFC4,stroke:#00B894,stroke-width:2px,color:#2D3436
+
+    class A user
+    class B ui
+    class C auth
+    class D deny
+    class E input
+    class F agent
+    class G memory
+    class H dispatch
+    class I,J,K,L,M,N,O tool
+    class P db
+    class Q,R,S output
+    class T response
+    linkStyle default stroke:#636E72,stroke-width:2px
 ```
 
 ---
@@ -120,18 +147,43 @@ The assistant uses RAG to retrieve relevant information from uploaded PDF, DOCX,
 ### RAG Workflow
 
 ```mermaid
-flowchart LR
-    A["📄 Upload Document"] --> B["Text Extraction"]
-    B --> C["Text Chunking"]
-    C --> D["Embedding Generation"]
-    D --> E[("ChromaDB")]
-    
-    F["User Question"] --> G["Query Embedding"]
-    G --> H["Semantic Search"]
-    E --> H
-    H --> I["Top 5 Relevant Chunks"]
-    I --> J["Gemini LLM"]
-    J --> K["Contextual Answer"]
+flowchart TB
+    subgraph INDEX["📥 Indexing Pipeline"]
+        direction LR
+        A(["📄 Upload Document"]) --> B["📝 Text Extraction"]
+        B --> C["✂️ Text Chunking<br/>500 tokens · 100 overlap"]
+        C --> D["🔢 Embedding Generation<br/>all-MiniLM-L6-v2"]
+    end
+
+    INDEX -->|"💾 store vectors"| E[("🗄️ ChromaDB")]
+
+    subgraph QUERY["🔎 Query Pipeline"]
+        direction LR
+        F(["❓ User Question"]) --> G["🔢 Query Embedding"]
+        G --> H["🎯 Semantic Search"]
+        H --> I["📑 Top 5 Relevant Chunks"]
+        I --> J["🧠 Gemini LLM"]
+        J --> K(["💬 Contextual Answer"])
+    end
+
+    E -->|"🎯 semantic search"| QUERY
+
+    classDef start fill:#6C5CE7,stroke:#4834D4,stroke-width:2px,color:#fff
+    classDef process fill:#74B9FF,stroke:#0984E3,stroke-width:2px,color:#2D3436
+    classDef embed fill:#00CEC9,stroke:#00A8A3,stroke-width:2px,color:#2D3436
+    classDef db fill:#FFB000,stroke:#C98A00,stroke-width:3px,color:#2D3436
+    classDef llm fill:#0984E3,stroke:#065A9E,stroke-width:3px,color:#fff
+    classDef answer fill:#00B894,stroke:#00866B,stroke-width:2px,color:#fff
+
+    class A,F start
+    class B,C,H,I process
+    class D,G embed
+    class E db
+    class J llm
+    class K answer
+    style INDEX fill:#F3F0FF,stroke:#6C5CE7,stroke-width:2px,stroke-dasharray:5 5,color:#2D3436
+    style QUERY fill:#E8F8F5,stroke:#00B894,stroke-width:2px,stroke-dasharray:5 5,color:#2D3436
+    linkStyle default stroke:#636E72,stroke-width:2px
 ```
 
 ### Implementation Details
@@ -171,20 +223,39 @@ Instead of relying on predefined keyword routing, the LLM determines which tool 
 
 ```mermaid
 flowchart TD
-    A["User Query"] --> B["Build Prompt"]
-    B --> C["Load Memory and File Context"]
-    C --> D["Gemini Function Calling"]
-    D --> E{"Tool Required?"}
+    A(["💬 User Query"]) --> B["🛠️ Build Prompt"]
+    B --> C[("💾 Load Memory and File Context")]
+    C --> D["🧠 Gemini Function Calling"]
+    D --> E{"🤔 Tool Required?"}
 
-    E -->|No| F["Generate Final Answer"]
-    E -->|Yes| G["Execute Selected Tool"]
+    E -->|No| F["✍️ Generate Final Answer"]
+    E -->|Yes| G["⚙️ Execute Selected Tool"]
 
-    G --> H["Process Tool Result"]
-    H --> I["Send JSON-Safe Response"]
-    I --> D
+    G --> H["📦 Process Tool Result"]
+    H --> I["🔁 Send JSON-Safe Response"]
+    I -->|"loop · max MAX_TOOL_STEPS"| D
 
-    F --> J["Save Conversation Memory"]
-    J --> K["Display Answer and Artifacts"]
+    F --> J[("💾 Save Conversation Memory")]
+    J --> K(["🖥️ Display Answer and Artifacts"])
+
+    classDef start fill:#6C5CE7,stroke:#4834D4,stroke-width:2px,color:#fff
+    classDef prep fill:#74B9FF,stroke:#0984E3,stroke-width:2px,color:#2D3436
+    classDef memory fill:#A29BFE,stroke:#6C5CE7,stroke-width:2px,color:#2D3436
+    classDef llm fill:#0984E3,stroke:#065A9E,stroke-width:3px,color:#fff
+    classDef decision fill:#FDCB6E,stroke:#E17055,stroke-width:2px,color:#2D3436
+    classDef tool fill:#00CEC9,stroke:#00A8A3,stroke-width:2px,color:#2D3436
+    classDef loop fill:#FD79A8,stroke:#E84393,stroke-width:2px,color:#2D3436
+    classDef final fill:#00B894,stroke:#00866B,stroke-width:2px,color:#fff
+
+    class A start
+    class B prep
+    class C,J memory
+    class D llm
+    class E decision
+    class G,H tool
+    class I loop
+    class F,K final
+    linkStyle default stroke:#636E72,stroke-width:2px
 ```
 
 The execution loop is controlled by `MAX_TOOL_STEPS` to prevent unlimited tool execution.
@@ -436,4 +507,3 @@ __pycache__/
   <br/>
   ⭐ If you find this project interesting, consider giving it a star!
 </p>
- 
